@@ -14,17 +14,122 @@ const docTemplate = `{
     },
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
-    "paths": {}
+    "paths": {
+        "/resultUser": {
+            "get": {
+                "description": "Вычисляет среднее значение сохраненных чисел",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Пользовательские данные"
+                ],
+                "summary": "Получить среднее значение",
+                "responses": {
+                    "200": {
+                        "description": "Среднее значение",
+                        "schema": {
+                            "$ref": "#/definitions/main.AverageResult"
+                        }
+                    },
+                    "404": {
+                        "description": "Ошибка: Числа не найдены",
+                        "schema": {
+                            "$ref": "#/definitions/main.ResponseError"
+                        }
+                    }
+                }
+            }
+        },
+        "/userData": {
+            "post": {
+                "description": "Сохраняет массив из 10 чисел",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Пользовательские данные"
+                ],
+                "summary": "Добавить массив чисел",
+                "parameters": [
+                    {
+                        "description": "Массив из 10 чисел",
+                        "name": "userData",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/main.UserData"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Успешное добавление",
+                        "schema": {
+                            "$ref": "#/definitions/main.ResponseOK"
+                        }
+                    },
+                    "400": {
+                        "description": "Ошибка: Неверные данные",
+                        "schema": {
+                            "$ref": "#/definitions/main.ResponseError"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "main.AverageResult": {
+            "type": "object",
+            "properties": {
+                "result": {
+                    "type": "number"
+                }
+            }
+        },
+        "main.ResponseError": {
+            "type": "object",
+            "properties": {
+                "error": {
+                    "type": "string"
+                }
+            }
+        },
+        "main.ResponseOK": {
+            "type": "object",
+            "properties": {
+                "message": {
+                    "type": "string"
+                }
+            }
+        },
+        "main.UserData": {
+            "type": "object",
+            "properties": {
+                "values": {
+                    "description": "Массив из 10 значений",
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                }
+            }
+        }
+    }
 }`
 
 // SwaggerInfo holds exported Swagger Info so clients can modify it
 var SwaggerInfo = &swag.Spec{
-	Version:          "",
-	Host:             "",
-	BasePath:         "",
+	Version:          "1.0",
+	Host:             "localhost:8081",
+	BasePath:         "/",
 	Schemes:          []string{},
-	Title:            "",
-	Description:      "",
+	Title:            "Swagger Example API",
+	Description:      "Это пример API для работы с пользовательскими данными.",
 	InfoInstanceName: "swagger",
 	SwaggerTemplate:  docTemplate,
 	LeftDelim:        "{{",

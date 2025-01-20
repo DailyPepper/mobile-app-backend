@@ -1,4 +1,76 @@
+basePath: /
+definitions:
+  main.AverageResult:
+    properties:
+      result:
+        type: number
+    type: object
+  main.ResponseError:
+    properties:
+      error:
+        type: string
+    type: object
+  main.ResponseOK:
+    properties:
+      message:
+        type: string
+    type: object
+  main.UserData:
+    properties:
+      values:
+        description: Массив из 10 значений
+        items:
+          type: integer
+        type: array
+    type: object
+host: localhost:8081
 info:
   contact: {}
-paths: {}
+  description: Это пример API для работы с пользовательскими данными.
+  title: Swagger Example API
+  version: "1.0"
+paths:
+  /resultUser:
+    get:
+      description: Вычисляет среднее значение сохраненных чисел
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Среднее значение
+          schema:
+            $ref: '#/definitions/main.AverageResult'
+        "404":
+          description: 'Ошибка: Числа не найдены'
+          schema:
+            $ref: '#/definitions/main.ResponseError'
+      summary: Получить среднее значение
+      tags:
+      - Пользовательские данные
+  /userData:
+    post:
+      consumes:
+      - application/json
+      description: Сохраняет массив из 10 чисел
+      parameters:
+      - description: Массив из 10 чисел
+        in: body
+        name: userData
+        required: true
+        schema:
+          $ref: '#/definitions/main.UserData'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Успешное добавление
+          schema:
+            $ref: '#/definitions/main.ResponseOK'
+        "400":
+          description: 'Ошибка: Неверные данные'
+          schema:
+            $ref: '#/definitions/main.ResponseError'
+      summary: Добавить массив чисел
+      tags:
+      - Пользовательские данные
 swagger: "2.0"
