@@ -4,24 +4,22 @@
 
 ## Быстрый старт
 
-Следуйте этим шагам, чтобы клонировать и запустить проект локально.
-
 ### 1. Клонирование репозитория
 
 Выполните следующую команду, чтобы клонировать проект:
 
 ```
-    git clone https://github.com/DailyPepper/mobile-app-backend.git
+git clone https://github.com/DailyPepper/mobile-app-backend.git
 ```
 
 ### 2. Установка зависимостей
 
 ```
-    go mod tidy
+go mod tidy
 ```
 
 ### 3. Запуск сервера
 
 ```
-    go run main.go
+go run main.go
 ```
