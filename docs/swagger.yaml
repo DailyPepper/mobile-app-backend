@@ -2,6 +2,10 @@ basePath: /
 definitions:
   main.AverageResult:
     properties:
+      comment:
+        type: string
+      date:
+        type: string
       result:
         type: number
     type: object
@@ -10,15 +14,9 @@ definitions:
       error:
         type: string
     type: object
-  main.ResponseOK:
-    properties:
-      message:
-        type: string
-    type: object
   main.UserData:
     properties:
       values:
-        description: Массив из 10 значений
         items:
           type: integer
         type: array
@@ -26,32 +24,34 @@ definitions:
 host: localhost:8081
 info:
   contact: {}
-  description: Это пример API для работы с пользовательскими данными.
-  title: Swagger Example API
+  description: Это API для работы с пользовательскими данными BASFI.
+  title: Swagger index BASFI API
   version: "1.0"
 paths:
   /resultUser:
     get:
-      description: Вычисляет среднее значение сохраненных чисел
+      description: Возвращает все расчеты BASFI, если данные были добавлены
       produces:
       - application/json
       responses:
         "200":
-          description: Среднее значение
+          description: Все расчеты BASFI
           schema:
-            $ref: '#/definitions/main.AverageResult'
+            items:
+              $ref: '#/definitions/main.AverageResult'
+            type: array
         "404":
-          description: 'Ошибка: Числа не найдены'
+          description: 'Ошибка: Данные не найдены'
           schema:
             $ref: '#/definitions/main.ResponseError'
-      summary: Получить среднее значение
+      summary: Получение всех расчетов BASFI
       tags:
       - Пользовательские данные
   /userData:
     post:
       consumes:
       - application/json
-      description: Сохраняет массив из 10 чисел
+      description: Сохраняет данные пользователя и возвращает расчет BASFI
       parameters:
       - description: Массив из 10 чисел
         in: body
@@ -63,14 +63,14 @@ paths:
       - application/json
       responses:
         "200":
-          description: Успешное добавление
+          description: Успешное добавление с расчетом BASFI
           schema:
-            $ref: '#/definitions/main.ResponseOK'
+            $ref: '#/definitions/main.AverageResult'
         "400":
           description: 'Ошибка: Неверные данные'
           schema:
             $ref: '#/definitions/main.ResponseError'
-      summary: Добавить массив чисел
+      summary: Добавление данных пользователя BASFI
       tags:
       - Пользовательские данные
 swagger: "2.0"

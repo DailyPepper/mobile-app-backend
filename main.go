@@ -1,7 +1,9 @@
 package main
 
 import (
+	"fmt"
 	"net/http"
+	"time"
 
 	_ "github.com/DailyPepper/mobile-app-backend/docs"
 	"github.com/gin-gonic/gin"
@@ -10,7 +12,7 @@ import (
 )
 
 type UserData struct {
-	Values []int `json:"values"` // Массив из 10 значений
+	Values []int `json:"values"`
 }
 
 type ResponseOK struct {
@@ -22,19 +24,22 @@ type ResponseError struct {
 }
 
 type AverageResult struct {
-	Result float64 `json:"result"`
+	Result  float64 `json:"result"`
+	Comment string  `json:"comment"`
+	Date    string  `json:"date"`
 }
 
 var storedNumbers []int
+var allCalculations []AverageResult
 
 // postUserData добавляет значения пользователя
-// @Summary Добавить массив чисел
-// @Description Сохраняет массив из 10 чисел
+// @Summary Добавление данных пользователя BASFI
+// @Description Сохраняет данные пользователя и возвращает расчет BASFI
 // @Tags Пользовательские данные
 // @Accept json
 // @Produce json
 // @Param userData body UserData true "Массив из 10 чисел"
-// @Success 200 {object} ResponseOK "Успешное добавление"
+// @Success 200 {object} AverageResult "Успешное добавление с расчетом BASFI"
 // @Failure 400 {object} ResponseError "Ошибка: Неверные данные"
 // @Router /userData [post]
 func postUserData(c *gin.Context) {
@@ -50,37 +55,57 @@ func postUserData(c *gin.Context) {
 		return
 	}
 
-	storedNumbers = input.Values
+	var sum int
+	for _, num := range input.Values {
+		sum += num
+	}
+	average := float64(sum) / float64(len(input.Values))
 
-	c.JSON(http.StatusOK, gin.H{"message": "Successfully added numbers"})
+	var basfiComment string
+	if average <= 3 {
+		basfiComment = fmt.Sprintf("Ваш индекс BASFI: %.1f. Отсутствие ограничений.", average)
+	} else if average >= 4 && average <= 6 {
+		basfiComment = fmt.Sprintf("Ваш индекс BASFI: %.1f. Умеренные ограничения.", average)
+	} else {
+		basfiComment = fmt.Sprintf("Ваш индекс BASFI: %.1f. Невозможность выполнить определенное действие. Рекомендуется консультация врача.", average)
+	}
+
+	storedNumbers = input.Values
+	calculation := AverageResult{
+		Result:  average,
+		Comment: basfiComment,
+		Date:    time.Now().Format(time.RFC3339),
+	}
+
+	allCalculations = append(allCalculations, calculation)
+
+	fmt.Printf("POST data saved: %v\n", calculation)
+
+	c.JSON(http.StatusOK, calculation)
 }
 
-// getResultUser возвращает среднее значение чисел
-// @Summary Получить среднее значение
-// @Description Вычисляет среднее значение сохраненных чисел
+// getResultUser возвращает все сохраненные расчеты
+// @Summary Получение всех расчетов BASFI
+// @Description Возвращает все расчеты BASFI, если данные были добавлены
 // @Tags Пользовательские данные
 // @Produce json
-// @Success 200 {object} AverageResult "Среднее значение"
-// @Failure 404 {object} ResponseError "Ошибка: Числа не найдены"
+// @Success 200 {array} AverageResult "Все расчеты BASFI"
+// @Failure 404 {object} ResponseError "Ошибка: Данные не найдены"
 // @Router /resultUser [get]
 func getResultUser(c *gin.Context) {
-	if len(storedNumbers) == 0 {
-		c.JSON(http.StatusNotFound, gin.H{"error": "No numbers found"})
+	if len(allCalculations) == 0 {
+		c.JSON(http.StatusNotFound, gin.H{"error": "No data found"})
 		return
 	}
 
-	var sum int
-	for _, num := range storedNumbers {
-		sum += num
-	}
-	average := float64(sum) / float64(len(storedNumbers))
+	fmt.Printf("GET data sent: %v\n", allCalculations)
 
-	c.JSON(http.StatusOK, gin.H{"result": average})
+	c.JSON(http.StatusOK, allCalculations)
 }
 
-// @title Swagger Example API
+// @title Swagger index BASFI API
 // @version 1.0
-// @description Это пример API для работы с пользовательскими данными.
+// @description Это API для работы с пользовательскими данными BASFI.
 // @host localhost:8081
 // @BasePath /
 func main() {

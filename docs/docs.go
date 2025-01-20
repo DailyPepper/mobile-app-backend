@@ -17,23 +17,26 @@ const docTemplate = `{
     "paths": {
         "/resultUser": {
             "get": {
-                "description": "Вычисляет среднее значение сохраненных чисел",
+                "description": "Возвращает все расчеты BASFI, если данные были добавлены",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
                     "Пользовательские данные"
                 ],
-                "summary": "Получить среднее значение",
+                "summary": "Получение всех расчетов BASFI",
                 "responses": {
                     "200": {
-                        "description": "Среднее значение",
+                        "description": "Все расчеты BASFI",
                         "schema": {
-                            "$ref": "#/definitions/main.AverageResult"
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/main.AverageResult"
+                            }
                         }
                     },
                     "404": {
-                        "description": "Ошибка: Числа не найдены",
+                        "description": "Ошибка: Данные не найдены",
                         "schema": {
                             "$ref": "#/definitions/main.ResponseError"
                         }
@@ -43,7 +46,7 @@ const docTemplate = `{
         },
         "/userData": {
             "post": {
-                "description": "Сохраняет массив из 10 чисел",
+                "description": "Сохраняет данные пользователя и возвращает расчет BASFI",
                 "consumes": [
                     "application/json"
                 ],
@@ -53,7 +56,7 @@ const docTemplate = `{
                 "tags": [
                     "Пользовательские данные"
                 ],
-                "summary": "Добавить массив чисел",
+                "summary": "Добавление данных пользователя BASFI",
                 "parameters": [
                     {
                         "description": "Массив из 10 чисел",
@@ -67,9 +70,9 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "Успешное добавление",
+                        "description": "Успешное добавление с расчетом BASFI",
                         "schema": {
-                            "$ref": "#/definitions/main.ResponseOK"
+                            "$ref": "#/definitions/main.AverageResult"
                         }
                     },
                     "400": {
@@ -86,6 +89,12 @@ const docTemplate = `{
         "main.AverageResult": {
             "type": "object",
             "properties": {
+                "comment": {
+                    "type": "string"
+                },
+                "date": {
+                    "type": "string"
+                },
                 "result": {
                     "type": "number"
                 }
@@ -99,19 +108,10 @@ const docTemplate = `{
                 }
             }
         },
-        "main.ResponseOK": {
-            "type": "object",
-            "properties": {
-                "message": {
-                    "type": "string"
-                }
-            }
-        },
         "main.UserData": {
             "type": "object",
             "properties": {
                 "values": {
-                    "description": "Массив из 10 значений",
                     "type": "array",
                     "items": {
                         "type": "integer"
@@ -128,8 +128,8 @@ var SwaggerInfo = &swag.Spec{
 	Host:             "localhost:8081",
 	BasePath:         "/",
 	Schemes:          []string{},
-	Title:            "Swagger Example API",
-	Description:      "Это пример API для работы с пользовательскими данными.",
+	Title:            "Swagger index BASFI API",
+	Description:      "Это API для работы с пользовательскими данными BASFI.",
 	InfoInstanceName: "swagger",
 	SwaggerTemplate:  docTemplate,
 	LeftDelim:        "{{",
